@@ -82,18 +82,26 @@ class ShoppingCartController extends Controller
      *
      * @param $cart
      * @param $request
+     * @param $operator
      *
      * @return \Illuminate\Http\JsonResponse
      */
     private function checkProductIsInCart($cart, $request)
     {
         $existingItem = $cart->shoppingCartItems()->where('product_id', $request->product_id)->first();
+        $operator = $request->post('operator', 'increase');
 
         if ($existingItem) {
             // If the product is already in the cart, update the quantity
-            $existingItem->update([
-                'quantity' => $existingItem->quantity + $request->quantity,
-            ]);
+            if ($operator === 'increase') {
+                $existingItem->update([
+                    'quantity' => $existingItem->quantity + $request->quantity,
+                ]);
+            } else {
+                $existingItem->update([
+                    'quantity' => $existingItem->quantity - $request->quantity,
+                ]);
+            }
         } else {
             // If the product is not in the cart, create a new item
             $cart->shoppingCartItems()->create([
