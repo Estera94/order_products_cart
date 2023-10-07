@@ -7,20 +7,25 @@ use Illuminate\Database\Eloquent\Model;
 
 class ShoppingCartItems extends Model
 {
-	use HasFactory;
+    use HasFactory;
 
-	/**
-	 * The attributes that are mass assignable.
-	 *
-	 * @var array
-	 */
-	protected $fillable = [
-		'product_id',
-		'quantity',
-	];
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array
+     */
+    protected $fillable = [
+        'product_id',
+        'quantity',
+    ];
 
-	public function shoppingCart()
-	{
-		return $this->belongsTo(ShoppingCart::class, 'id');
-	}
+    public function shoppingCart()
+    {
+        return $this->belongsTo(ShoppingCart::class, 'id');
+    }
+
+    public function product()
+    {
+        return $this->belongsTo(Product::class, 'product_id');
+    }
 }
