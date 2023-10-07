@@ -14,6 +14,7 @@
                 <button type="button" class="btn btn-sm btn-primary" @click="openModal">
                   <span>View</span>
                   <i class="fa fa-shopping-cart"></i>
+                  <span class="quantity">{{ totalQuantity }}</span>
                 </button>
 
               </div>
@@ -94,7 +95,7 @@
               </div>
             </div>
 
-            <div class="subtotal">
+            <div v-if="productsCart.length > 0" class="subtotal">
               <p class="reset-margin">Subtotal:</p>
               <p class="reset-margin">£{{ subtotalOfProducts }}</p>
             </div>
@@ -126,6 +127,7 @@ export default {
     return {
       products: {},
       productsCart: [],
+      totalQuantity: 0,
     }
   },
 
@@ -139,14 +141,24 @@ export default {
     },
 
     addToCart(product) {
-      console.log(product)
 
-      Toast.fire({
-        icon: 'success',
-        title: `${product.name} added to the cart`,
-        timer: 1300
-      });
+      axios.post('/api/add-to-cart', {
+        product_id: product.id,
+        quantity: 1,
+      })
+          .then(({data}) => {
 
+            Toast.fire({
+              icon: 'success',
+              title: `${product.name} added to the cart`,
+              timer: 1300
+            });
+
+            this.totalQuantity = data.original.total_quantity
+          })
+          .catch(error => {
+            console.log(error)
+          });
     },
 
     openModal() {
@@ -191,6 +203,21 @@ export default {
 
 
 <style scoped lang="scss">
+.card-header {
+  position: relative;
+
+  .quantity {
+    position: absolute;
+    background: red;
+    color: #ffffff;
+    border-radius: 50%;
+    right: 2px;
+    top: 4px;
+    width: 22px;
+    padding: 1px;
+  }
+}
+
 .cart-container {
   display: flex;
   align-items: center;
@@ -270,7 +297,6 @@ export default {
     padding: 30px
   }
 }
-
 
 .disable {
   background: #dad3d3;

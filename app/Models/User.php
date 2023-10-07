@@ -11,67 +11,70 @@ use App\Models\Role;
 
 class User extends Authenticatable // implements MustVerifyEmail
 {
-    use HasFactory, Notifiable, HasApiTokens;
+	use HasFactory, Notifiable, HasApiTokens;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array
-     */
-    protected $fillable = [
-        'name', 'email', 'password', 'type'
-    ];
+	/**
+	 * The attributes that are mass assignable.
+	 *
+	 * @var array
+	 */
+	protected $fillable = [
+		'name', 'email', 'password', 'type'
+	];
+	/**
+	 * The attributes that should be hidden for arrays.
+	 *
+	 * @var array
+	 */
+	protected $hidden = [
+		'password', 'remember_token',
+	];
+	/**
+	 * The attributes that should be cast to native types.
+	 *
+	 * @var array
+	 */
+	protected $casts = [
+		'email_verified_at' => 'datetime',
+	];
 
-    /**
-     * The attributes that should be hidden for arrays.
-     *
-     * @var array
-     */
-    protected $hidden = [
-        'password', 'remember_token',
-    ];
+	/**
+	 * Get the profile photo URL attribute.
+	 *
+	 * @return string
+	 */
+	public function getPhotoAttribute()
+	{
+		return 'https://www.gravatar.com/avatar/' . md5(strtolower($this->email)) . '.jpg?s=200&d=mm';
+	}
 
-    /**
-     * The attributes that should be cast to native types.
-     *
-     * @var array
-     */
-    protected $casts = [
-        'email_verified_at' => 'datetime',
-    ];
+	public function roles()
+	{
+		return $this->belongsToMany(Role::class);
+	}
 
-     /**
-     * Get the profile photo URL attribute.
-     *
-     * @return string
-     */
-    public function getPhotoAttribute()
-    {
-        return 'https://www.gravatar.com/avatar/' . md5(strtolower($this->email)) . '.jpg?s=200&d=mm';
-    }
+	/**
+	 * Assigning User role
+	 *
+	 * @param \App\Models\Role $role
+	 */
+	public function assignRole(Role $role)
+	{
+		return $this->roles()->save($role);
+	}
 
-    public function roles()
-    {
-        return $this->belongsToMany(Role::class);
-    }
+	public function isAdmin()
+	{
+		return $this->roles()->where('name', 'Admin')->exists();
+	}
 
-    /**
-     * Assigning User role
-     *
-     * @param \App\Models\Role $role
-     */
-    public function assignRole(Role $role)
-    {
-        return $this->roles()->save($role);
-    }
+	public function isUser()
+	{
+		return $this->roles()->where('name', 'User')->exists();
+	}
 
-    public function isAdmin()
-    {
-        return $this->roles()->where('name', 'Admin')->exists();
-    }
-
-    public function isUser()
-    {
-        return $this->roles()->where('name', 'User')->exists();
-    }
+	public function shoppingCart()
+	{
+		return $this->hasOne(ShoppingCart::class);
+	}
 }
