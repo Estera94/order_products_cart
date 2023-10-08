@@ -27,4 +27,9 @@ class ShoppingCart extends Model
 	{
 		return $this->hasMany(ShoppingCartItems::class);
 	}
+
+	public function invoice()
+	{
+		return $this->hasOne(Invoice::class, 'id');
+	}
 }

@@ -18,6 +18,7 @@ class CreateShoppingCartsTable extends Migration
 			$table->unsignedInteger('user_id');
 			$table->enum('shopping_cart_status', ['pending', 'complete'])->default('pending');
 			$table->integer('shopping_cart_total')->nullable();
+			$table->boolean('invoice_status')->default(false);
 			$table->timestamps();
 		});
 	}
