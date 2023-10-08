@@ -44,8 +44,9 @@ Route::namespace('App\\Http\\Controllers')->group(function () {
 	Route::get('/cart-items', 'ShoppingCartController@index');
 	Route::post('/cart-items', 'ShoppingCartController@addToCart');
 	Route::delete('/cart-items/{id}', 'ShoppingCartController@deleteItem');
-
 	Route::post('/complete-order', 'ShoppingCartController@completeOrder');
+
+	Route::get('/orders', 'ViewOrdersController@index');
 });
 
 

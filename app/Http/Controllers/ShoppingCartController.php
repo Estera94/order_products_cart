@@ -29,9 +29,9 @@ class ShoppingCartController extends Controller
 		$user = auth()->user();
 
 		// Find or create the user's shopping cart
-		$cart = $user->shoppingCart()
-			->where('shopping_cart_status', 'pending')
-			->first();
+		$cart = $user->shoppingCart()->where('shopping_cart_status', 'pending')->firstOrNew([]);
+
+		$cart->save();
 
 		if ($cart->shopping_cart_status === 'pending') {
 			// Retrieve the products in the shopping cart along with their details
@@ -66,10 +66,10 @@ class ShoppingCartController extends Controller
 
 		$user = auth()->user();
 
-		// Find shopping cart
-		$cart = $user->shoppingCart()
-			->where('shopping_cart_status', 'pending')
-			->first();
+		// Find or create the user's shopping cart
+		$cart = $user->shoppingCart()->where('shopping_cart_status', 'pending')->firstOrNew([]);
+
+		$cart->save();
 
 		$item = $this->checkProductIsInCart($cart, $request);
 
@@ -79,10 +79,14 @@ class ShoppingCartController extends Controller
 	public function completeOrder(Request $request)
 	{
 		$user = auth()->user();
-
+		$shopping_cart_total = $request->post('shopping_cart_total');
+	
 		ShoppingCart::where('user_id', $user->id)
 			->where('shopping_cart_status', 'pending')
-			->update(['shopping_cart_status' => 'complete']);
+			->update([
+				'shopping_cart_status' => 'complete',
+				'shopping_cart_total' => $shopping_cart_total
+			]);
 
 		$newCart = new ShoppingCart([
 			'user_id' => $user->id,

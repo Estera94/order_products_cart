@@ -68,7 +68,7 @@
           @deleteItem="(id)=>deleteItem(id)"
           @increase="(product) => addToCart(product, 'increase')"
           @decrease="(product) => addToCart(product, 'decrease')"
-          @checkout="checkout"
+          @checkout="(total)=>checkout(total)"
       />
     </div>
   </section>
@@ -148,9 +148,9 @@ export default {
           });
     },
 
-    checkout() {
+    checkout(total) {
       axios.post('/api/complete-order', {
-        products: this.productsCart,
+        shopping_cart_total: total
       }).then((resp) => {
         this.loadCartItems()
       })
