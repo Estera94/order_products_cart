@@ -16,6 +16,7 @@ class CreateShoppingCartsTable extends Migration
 		Schema::create('shopping_carts', function (Blueprint $table) {
 			$table->id();
 			$table->unsignedInteger('user_id');
+			$table->enum('shopping_cart_status', ['pending', 'complete'])->default('pending');
 			$table->timestamps();
 		});
 	}

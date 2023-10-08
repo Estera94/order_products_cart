@@ -48,8 +48,11 @@
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Continue shopping
                     </button>
-                    <button type="submit" class="btn btn-primary"
-                            :class="{'disable': productsCart.length === 0}">
+                    <button
+                        @click.prevent="$emit('checkout')"
+                        type="submit" class="btn btn-primary"
+                        :class="{'disable': productsCart.length === 0}"
+                    >
                         Checkout
                     </button>
                 </div>
