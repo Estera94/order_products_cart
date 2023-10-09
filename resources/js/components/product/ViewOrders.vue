@@ -2,9 +2,7 @@
     <section class="content">
         <div class="container-fluid">
             <div class="row">
-
                 <div class="col-12">
-
                     <div class="card">
                         <div class="card-header">
                             <h3 class="card-title">Orders</h3>
@@ -76,14 +74,11 @@
 
 <script>
 import axios from "axios";
-import Modal from "./Partials/Modal.vue";
 import {debounce} from "lodash";
-import moment from "moment";
 import formattedDate from "./Partials/Helper";
 
 export default {
     name: "ViewOrders",
-    components: {Modal},
 
     data() {
         return {
@@ -100,7 +95,12 @@ export default {
 
         getResults() {
             const searchParams = new URLSearchParams(this.filterOption).toString();
-            axios.get(`/api/orders?${searchParams}`).then(({data}) => (this.orders = data));
+            axios.get(`/api/orders?${searchParams}`)
+                .then(({data}) => (this.orders = data))
+                .catch((error) => {
+                    console.log(error)
+                });
+            ;
         },
 
         setPageNo(page) {
@@ -112,7 +112,7 @@ export default {
         },
 
         invoice(order) {
-            axios.post(`/api/orders/${order.id}`)
+            axios.post(`/api/invoices/${order.id}`)
                 .then((data) => {
                     Toast.fire({
                         icon: 'success',

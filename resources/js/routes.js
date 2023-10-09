@@ -6,10 +6,11 @@ export default [
     {path: '/products', component: require('./components/product/Products.vue').default},
     {path: '/catalog', component: require('./components/product/Catalog.vue').default},
     {path: '/view/orders', component: require('./components/product/ViewOrders.vue').default},
+    {path: '/view/invoices', component: require('./components/product/ViewInvoices.vue').default},
     {path: '/product/tag', component: require('./components/product/Tag.vue').default},
     {path: '/product/category', component: require('./components/product/Category.vue').default},
-    {path: '/view-invoice', component: require('./components/product/ViewInvoice.vue').default},
-    {path: '/view-order', component: require('./components/product/ViewOrder.vue').default},
+    {path: '/view-invoice', component: require('./components/product/Pages/ViewInvoice.vue').default},
+    {path: '/view-order', component: require('./components/product/Pages/ViewOrder.vue').default},
 
     {path: '*', component: require('./components/NotFound.vue').default}
 ];

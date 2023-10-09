@@ -34,13 +34,20 @@
                 <router-link to="/view/orders" class="nav-link">
                     <i class="nav-icon fas fa-list orange"></i>
                     <p>
-                        View orders
+                        Orders
                     </p>
                 </router-link>
             </li>
-        @endcan
 
-        @can('isAdmin')
+            <li class="nav-item">
+                <router-link to="/view/invoices" class="nav-link">
+                    <i class="nav-icon fas fa-list orange"></i>
+                    <p>
+                        Invoices
+                    </p>
+                </router-link>
+            </li>
+
             <li class="nav-item">
                 <router-link to="/users" class="nav-link">
                     <i class="fa fa-users nav-icon blue"></i>

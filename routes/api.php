@@ -49,8 +49,9 @@ Route::namespace('App\\Http\\Controllers')->group(function () {
     Route::get('/orders', 'ViewOrdersController@index');
     Route::get('/view-order', 'ViewOrdersController@show');
 
-    Route::post('/orders/{id}', 'InvoiceController@create');
+    Route::get('/invoices', 'InvoiceController@index');
     Route::get('/view-invoice', 'InvoiceController@show');
+    Route::post('/invoices/{id}', 'InvoiceController@create');
 });
 
 

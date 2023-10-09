@@ -19,6 +19,36 @@ class InvoiceController extends Controller
     }
 
     /**
+     *  Display order's invoice.
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function index()
+    {
+        $invoices = Invoice::all();
+        $invoiceDetails = [];
+
+        foreach ($invoices as $invoice) {
+            $shoppingCart = ShoppingCart::find($invoice->shopping_cart_id);
+
+            if ($shoppingCart) {
+                $shoppingCart->load([
+                    'user' => function ($userQuery) {
+                        $userQuery->select('id', 'name', 'email');
+                    },
+                    'shoppingCartItems.product' => function ($productQuery) {
+                        $productQuery->select('id', 'name', 'description', 'photo', 'price');
+                    },
+                ]);
+
+                $invoiceDetails[] = $shoppingCart;
+            }
+        }
+
+        return response()->json(['data' => $invoiceDetails]);
+    }
+
+    /**
      * Create invoice order
      *
      * @param $id
