@@ -65,10 +65,12 @@ class ViewOrdersController extends BaseController
                 'user' => function ($userQuery) {
                     $userQuery->select('id', 'name', 'email');
                 },
-                'shoppingCartItems'
+                'shoppingCartItems.product' => function ($productQuery) {
+                    $productQuery->select('id', 'name', 'description', 'photo', 'price');
+                },
             ])
             ->first();
 
-        return response()->json(['order' => $order]);
+        return response()->json(['data' => $order]);
     }
 }

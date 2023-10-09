@@ -73,9 +73,11 @@ export default {
         formattedDate,
 
         loadOrders() {
-            axios.get(`/api/view-invoice?invoice_id=${this.$route.query.invoice_id}`).then(({data}) => {
-                this.data = data.data
-            })
+            axios.get(`/api/view-invoice?invoice_id=${this.$route.query.invoice_id}`)
+                .then(({data}) => this.data = data.data)
+                .catch((error) => {
+                    console.log(error)
+                });
         }
     },
 
@@ -85,11 +87,9 @@ export default {
         },
     },
 
-
     created() {
         this.loadOrders()
     },
-
 }
 </script>
 

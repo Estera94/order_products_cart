@@ -2,14 +2,11 @@
     <section class="content">
         <div class="container-fluid">
             <div class="row">
-
                 <div class="col-12">
-
                     <div class="card">
                         <div class="card-header">
                             <h3 class="card-title">Invoices</h3>
                         </div>
-
 
                         <!-- /.card-header -->
                         <div class="card-body table-responsive p-0">
@@ -30,7 +27,9 @@
                                     <td>£{{ invoice.shopping_cart_total }}</td>
                                     <td>{{ invoice.user.name }}</td>
                                     <td>{{ invoice.user.email }}</td>
-                                    <td>view order</td>
+                                    <td style="text-align:center;cursor: pointer" @click="goToOrder(invoice)">
+                                        <strong>view order</strong>
+                                    </td>
                                 </tr>
                                 </tbody>
                             </table>
@@ -66,6 +65,10 @@ export default {
                 .catch((error) => {
                     console.log(error)
                 });
+        },
+
+        goToOrder(order) {
+            window.location.href = `/view-order?order_id=${order.id}`
         }
     },
 
