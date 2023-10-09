@@ -16,7 +16,7 @@
                                         aria-haspopup="true"
                                         aria-expanded="false"
                                     >
-                                        {{ filterOption.order_status }}
+                                        {{ selectedFilter[filterOption.order_status] }}
                                     </button>
                                     <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
                                         <a class="dropdown-item" @click="filter('all')">All</a>
@@ -136,6 +136,15 @@ export default {
         this.getResults();
     },
 
+    computed: {
+        selectedFilter() {
+            return {
+                all: 'All',
+                invoiced: 'Invoiced',
+                not_invoiced: 'Not Invoiced'
+            }
+        }
+    },
 
     watch: {
         filterOption: {
