@@ -3,9 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\API\V1\BaseController;
-use App\Models\Invoice;
 use App\Models\ShoppingCart;
-use App\Models\User;
+use Illuminate\Http\Request;
 
 class ViewOrdersController extends BaseController
 {
@@ -19,35 +18,36 @@ class ViewOrdersController extends BaseController
 		$this->middleware('auth:api');
 	}
 
-	public function index()
+	/**
+	 * Display user's orders
+	 *
+	 * @return \Illuminate\Http\JsonResponse
+	 */
+	public function index(Request $request)
 	{
-		$shoppingCarts = shoppingCart::where('shopping_cart_status', 'complete')
+		// Get the filter parameter from the request
+		$filter = $request->post('order_status', 'all');
+
+		// Define a base query
+		$query = ShoppingCart::where('shopping_cart_status', 'complete')
+			->latest()
 			->with([
 				'user' => function ($userQuery) {
 					$userQuery->select('id', 'name', 'email');
-				}, 'shoppingCartItems'
-			])
-			->get();
-
-		return response()->json($shoppingCarts);
-	}
-
-	public function addInvoice($id)
-	{
-		$invoice = new Invoice([
-			'shopping_cart_id' => $id,
-		]);
-
-		// Save the invoice to the database.
-		$invoice->save();
-
-		// Update the shopping cart's invoice_status to true.
-		ShoppingCart::where('id', $id)
-			->where('invoice_status', false)
-			->update([
-				'invoice_status' => true,
+				},
+				'shoppingCartItems'
 			]);
 
-		return response()->json(['message' => 'Invoice created successfully']);
+		// Apply filtering based on the 'filter' parameter
+		if ($filter === 'invoiced') {
+			$query->where('invoice_status', true);
+		} elseif ($filter === 'not_invoiced') {
+			$query->where('invoice_status', false);
+		}
+
+		// Paginate the results
+		$shoppingCarts = $query->paginate(10);
+
+		return response()->json($shoppingCarts);
 	}
 }

@@ -18,12 +18,12 @@
                       aria-haspopup="true"
                       aria-expanded="false"
                   >
-                    {{ filterOption }}
+                    {{ filterOption.order_status }}
                   </button>
                   <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                    <a class="dropdown-item" @click="filter('All')">All</a>
-                    <a class="dropdown-item" @click="filter('Invoiced')">Invoiced</a>
-                    <a class="dropdown-item" @click="filter('Not Invoiced')">Not Invoiced</a>
+                    <a class="dropdown-item" @click="filter('all')">All</a>
+                    <a class="dropdown-item" @click="filter('invoiced')">Invoiced</a>
+                    <a class="dropdown-item" @click="filter('not_invoiced')">Not Invoiced</a>
                   </div>
                 </div>
               </div>
@@ -43,7 +43,7 @@
                 </tr>
                 </thead>
                 <tbody>
-                <tr v-for="order in filteredOrders" :key="order.id">
+                <tr v-for="order in orders.data" :key="order.id">
                   <td>{{ order.id }}</td>
                   <td>{{ formattedDate(order.created_at) }}</td>
                   <td>£{{ order.shopping_cart_total }}</td>
@@ -62,7 +62,10 @@
                 </tbody>
               </table>
             </div>
-            <!-- /.card-body -->
+            <!--            /.card-body-->
+            <div class="card-footer">
+              <pagination :data="orders" @pagination-change-page="setPageNo"></pagination>
+            </div>
           </div>
           <!-- /.card -->
         </div>
@@ -74,6 +77,8 @@
 <script>
 import axios from "axios";
 import Modal from "./Partials/Modal.vue";
+import {debounce} from "lodash";
+import moment from "moment";
 
 export default {
   name: "ViewOrders",
@@ -81,21 +86,26 @@ export default {
 
   data() {
     return {
-      orders: [],
-      filterOption: "All",
+      orders: {},
+      filterOption: {
+        order_status: 'all',
+        page: 1
+      },
     }
   },
 
   methods: {
-    loadOrders() {
+    getResults() {
+      const searchParams = new URLSearchParams(this.filterOption).toString();
+      axios.get(`/api/orders?${searchParams}`).then(({data}) => (this.orders = data));
+    },
 
-      axios.get('/api/orders')
-          .then(({data}) => {
-            this.orders = data
-          })
-          .catch((error) => {
-            console.log(error)
-          });
+    setPageNo(page) {
+      this.filterOption.page = page
+    },
+
+    filter(option) {
+      this.filterOption.order_status = option
     },
 
     invoice(order) {
@@ -109,39 +119,30 @@ export default {
               timer: 1300
             });
 
-            this.loadOrders()
+            order.invoice_status = 1
           })
           .catch((error) => {
             console.log(error)
           });
     },
 
-    filter(option) {
-      this.filterOption = option;
-    },
 
     formattedDate(dateToFormat) {
-      const options = {weekday: "short", day: "numeric", month: "short"};
-      const date = new Date(dateToFormat);
-
-      return date.toLocaleDateString("en-US", options);
-    },
-  },
-  
-  computed: {
-    filteredOrders() {
-      if (this.filterOption === "All") {
-        return this.orders;
-      } else if (this.filterOption === "Invoiced") {
-        return this.orders.filter((order) => order.invoice_status);
-      } else if (this.filterOption === "Not Invoiced") {
-        return this.orders.filter((order) => !order.invoice_status);
-      }
+      return moment(dateToFormat).format('ddd, MMM D');
     },
   },
 
   created() {
-    this.loadOrders()
+    this.getResults();
+  },
+
+  watch: {
+    filterOption: {
+      handler: debounce(function () {
+        this.getResults();
+      }, 500),
+      deep: true
+    }
   }
 }
 </script>

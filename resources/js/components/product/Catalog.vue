@@ -14,7 +14,7 @@
                 <button type="button" class="btn btn-sm btn-primary" @click="openModal">
                   <span>View</span>
                   <i class="fa fa-shopping-cart"></i>
-                  <span class="quantity">{{ totalQuantity }}</span>
+                  <span v-show="totalQuantity" class="quantity">{{ totalQuantity }}</span>
                 </button>
 
               </div>
@@ -107,7 +107,6 @@ export default {
           .catch(error => {
             console.log(error)
           });
-      ;
     },
 
     addToCart(product, operator) {

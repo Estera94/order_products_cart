@@ -58,12 +58,6 @@ class ShoppingCartController extends Controller
 	 */
 	public function addToCart(Request $request)
 	{
-		// Validate the request data
-		$request->validate([
-			'product_id' => 'required|integer',
-			'quantity' => 'required|integer|min:1',
-		]);
-
 		$user = auth()->user();
 
 		// Find or create the user's shopping cart
@@ -80,7 +74,7 @@ class ShoppingCartController extends Controller
 	{
 		$user = auth()->user();
 		$shopping_cart_total = $request->post('shopping_cart_total');
-	
+
 		ShoppingCart::where('user_id', $user->id)
 			->where('shopping_cart_status', 'pending')
 			->update([

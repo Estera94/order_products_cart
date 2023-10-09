@@ -47,7 +47,7 @@ Route::namespace('App\\Http\\Controllers')->group(function () {
 	Route::post('/complete-order', 'ShoppingCartController@completeOrder');
 
 	Route::get('/orders', 'ViewOrdersController@index');
-	Route::post('/orders/{id}', 'ViewOrdersController@addInvoice');
+	Route::post('/orders/{id}', 'InvoiceController@createInvoice');
 });
 
 

@@ -17,9 +17,4 @@ class Invoice extends Model
 	protected $fillable = [
 		'shopping_cart_id',
 	];
-
-	public function shoppingCart()
-	{
-		return $this->belongsTo(ShoppingCart::class);
-	}
 }
