@@ -45,7 +45,7 @@
                                 <tbody>
                                 <tr v-for="(order, index) in orders.data" :key="order.id">
                                     <td style="cursor: pointer">{{ order.id }}</td>
-                                    <td>{{ formattedDate[index] }}</td>
+                                    <td>{{ formattedDate(order.created_at) }}</td>
                                     <td>£{{ order.shopping_cart_total }}</td>
                                     <td>{{ order.user.name }}</td>
                                     <td>{{ order.user.email }}</td>
@@ -79,6 +79,7 @@ import axios from "axios";
 import Modal from "./Partials/Modal.vue";
 import {debounce} from "lodash";
 import moment from "moment";
+import formattedDate from "./Partials/Helper";
 
 export default {
     name: "ViewOrders",
@@ -95,6 +96,8 @@ export default {
     },
 
     methods: {
+        formattedDate,
+
         getResults() {
             const searchParams = new URLSearchParams(this.filterOption).toString();
             axios.get(`/api/orders?${searchParams}`).then(({data}) => (this.orders = data));
@@ -111,8 +114,6 @@ export default {
         invoice(order) {
             axios.post(`/api/orders/${order.id}`)
                 .then((data) => {
-                    console.log(data)
-
                     Toast.fire({
                         icon: 'success',
                         title: `Invoice was created`,
@@ -135,13 +136,6 @@ export default {
         this.getResults();
     },
 
-    computed: {
-        formattedDate() {
-            return this.orders.data.map(order => {
-                return moment(order.created_at).format('ddd, MMM D');
-            })
-        }
-    },
 
     watch: {
         filterOption: {

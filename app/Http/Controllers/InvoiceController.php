@@ -60,7 +60,9 @@ class InvoiceController extends Controller
                 'user' => function ($userQuery) {
                     $userQuery->select('id', 'name', 'email');
                 },
-                'shoppingCartItems'
+                'shoppingCartItems.product' => function ($productQuery) {
+                    $productQuery->select('id', 'name', 'description', 'photo', 'price');
+                },
             ])
             ->first();
 

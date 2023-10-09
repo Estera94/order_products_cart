@@ -52,8 +52,6 @@ class ViewOrdersController extends BaseController
     }
 
     /**
-     * Show order details
-     *
      * @param Request $request
      *
      * @return \Illuminate\Http\JsonResponse
