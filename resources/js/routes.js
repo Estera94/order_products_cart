@@ -8,5 +8,8 @@ export default [
     {path: '/view/orders', component: require('./components/product/ViewOrders.vue').default},
     {path: '/product/tag', component: require('./components/product/Tag.vue').default},
     {path: '/product/category', component: require('./components/product/Category.vue').default},
+    {path: '/view-invoice', component: require('./components/product/ViewInvoice.vue').default},
+    {path: '/view-order', component: require('./components/product/ViewOrder.vue').default},
+
     {path: '*', component: require('./components/NotFound.vue').default}
 ];

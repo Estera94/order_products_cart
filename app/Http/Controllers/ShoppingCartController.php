@@ -9,131 +9,131 @@ use Illuminate\Http\Request;
 
 class ShoppingCartController extends Controller
 {
-	/**
-	 * Create a new controller instance.
-	 *
-	 * @return void
-	 */
-	public function __construct()
-	{
-		$this->middleware('auth:api');
-	}
+    /**
+     * Create a new controller instance.
+     *
+     * @return void
+     */
+    public function __construct()
+    {
+        $this->middleware('auth:api');
+    }
 
-	/**
-	 *  Display the products in the user's shopping cart.
-	 *
-	 * @return \Illuminate\Http\JsonResponse
-	 */
-	public function index()
-	{
-		$user = auth()->user();
+    /**
+     *  Display the products in the user's shopping cart.
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function index()
+    {
+        $user = auth()->user();
 
-		// Find or create the user's shopping cart
-		$cart = $user->shoppingCart()->where('shopping_cart_status', 'pending')->firstOrNew([]);
+        // Find or create the user's shopping cart
+        $cart = $user->shoppingCart()->where('shopping_cart_status', 'pending')->firstOrNew([]);
 
-		$cart->save();
+        $cart->save();
 
-		if ($cart->shopping_cart_status === 'pending') {
-			// Retrieve the products in the shopping cart along with their details
-			$cartItems = $cart->shoppingCartItems()
-				->with('product')
-				->with('product.category')
-				->get();
+        if ($cart->shopping_cart_status === 'pending') {
+            // Retrieve the products in the shopping cart along with their details
+            $cartItems = $cart->shoppingCartItems()
+                ->with('product')
+                ->with('product.category')
+                ->get();
 
-			return response()->json([
-				'products_in_cart' => $cartItems,
-				'total_quantity' => $cart->shoppingCartItems()->sum('quantity')
-			]);
-		} else {
-			return response()->json(['message' => 'Cart is complete']);
-		}
-	}
+            return response()->json([
+                'products_in_cart' => $cartItems,
+                'total_quantity' => $cart->shoppingCartItems()->sum('quantity')
+            ]);
+        } else {
+            return response()->json(['message' => 'Cart is complete']);
+        }
+    }
 
-	/**
-	 * Add item to cart.
-	 *
-	 * @param Request $request
-	 *
-	 * @return \Illuminate\Http\JsonResponse
-	 */
-	public function addToCart(Request $request)
-	{
-		$user = auth()->user();
+    /**
+     * Add item to cart.
+     *
+     * @param Request $request
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function create(Request $request)
+    {
+        $user = auth()->user();
 
-		// Find or create the user's shopping cart
-		$cart = $user->shoppingCart()->where('shopping_cart_status', 'pending')->firstOrNew([]);
+        // Find or create the user's shopping cart
+        $cart = $user->shoppingCart()->where('shopping_cart_status', 'pending')->firstOrNew([]);
 
-		$cart->save();
+        $cart->save();
 
-		$item = $this->checkProductIsInCart($cart, $request);
+        $item = $this->checkProductIsInCart($cart, $request);
 
-		return response()->json($item);
-	}
+        return response()->json($item);
+    }
 
-	public function completeOrder(Request $request)
-	{
-		$user = auth()->user();
-		$shopping_cart_total = $request->post('shopping_cart_total');
+    public function update(Request $request)
+    {
+        $user = auth()->user();
+        $shopping_cart_total = $request->post('shopping_cart_total');
 
-		ShoppingCart::where('user_id', $user->id)
-			->where('shopping_cart_status', 'pending')
-			->update([
-				'shopping_cart_status' => 'complete',
-				'shopping_cart_total' => $shopping_cart_total
-			]);
+        ShoppingCart::where('user_id', $user->id)
+            ->where('shopping_cart_status', 'pending')
+            ->update([
+                'shopping_cart_status' => 'complete',
+                'shopping_cart_total' => $shopping_cart_total
+            ]);
 
-		$newCart = new ShoppingCart([
-			'user_id' => $user->id,
-			'shopping_cart_status' => 'pending',
-		]);
+        $newCart = new ShoppingCart([
+            'user_id' => $user->id,
+            'shopping_cart_status' => 'pending',
+        ]);
 
-		$newCart->save();
+        $newCart->save();
 
-		return response()->json(['message' => 'Cart status updated']);
-	}
+        return response()->json(['message' => 'Cart status updated']);
+    }
 
-	public function deleteItem($id)
-	{
-		ShoppingCartItems::where('product_id', $id)->delete();
+    public function delete($id)
+    {
+        ShoppingCartItems::where('product_id', $id)->delete();
 
-		return response()->json(['message' => 'Cart item deleted successfully']);
-	}
+        return response()->json(['message' => 'Cart item deleted successfully']);
+    }
 
-	/**
-	 *  Check if the product is already in the cart.
-	 *
-	 * @param $cart
-	 * @param $request
-	 * @param $operator
-	 *
-	 * @return \Illuminate\Http\JsonResponse
-	 */
-	private function checkProductIsInCart($cart, $request)
-	{
-		$existingItem = $cart->shoppingCartItems()->where('product_id', $request->product_id)->first();
-		$operator = $request->post('operator', 'increase');
+    /**
+     *  Check if the product is already in the cart.
+     *
+     * @param $cart
+     * @param $request
+     * @param $operator
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    private function checkProductIsInCart($cart, $request)
+    {
+        $existingItem = $cart->shoppingCartItems()->where('product_id', $request->product_id)->first();
+        $operator = $request->post('operator', 'increase');
 
-		if ($existingItem) {
-			// If the product is already in the cart, update the quantity
-			if ($operator === 'increase') {
-				$existingItem->update([
-					'quantity' => $existingItem->quantity + $request->quantity,
-				]);
-			} else {
-				$existingItem->update([
-					'quantity' => $existingItem->quantity - $request->quantity,
-				]);
-			}
-		} else {
-			// If the product is not in the cart, create a new item
-			$cart->shoppingCartItems()->create([
-				'product_id' => $request->product_id,
-				'quantity' => $request->quantity,
-			]);
-		}
+        if ($existingItem) {
+            // If the product is already in the cart, update the quantity
+            if ($operator === 'increase') {
+                $existingItem->update([
+                    'quantity' => $existingItem->quantity + $request->quantity,
+                ]);
+            } else {
+                $existingItem->update([
+                    'quantity' => $existingItem->quantity - $request->quantity,
+                ]);
+            }
+        } else {
+            // If the product is not in the cart, create a new item
+            $cart->shoppingCartItems()->create([
+                'product_id' => $request->product_id,
+                'quantity' => $request->quantity,
+            ]);
+        }
 
-		return response()->json([
-			'total_quantity' => $cart->shoppingCartItems()->sum('quantity')
-		]);
-	}
+        return response()->json([
+            'total_quantity' => $cart->shoppingCartItems()->sum('quantity')
+        ]);
+    }
 }
